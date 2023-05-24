@@ -1286,6 +1286,10 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
       });
     });
 
+    it('batch-items-filter', function () {
+       console.log(rootContainer.querySelector('batch-items-filter').innerHTML);
+      });
+
     it('should display Pallet Utilization', function () {
       expect(
         rootContainer.querySelector('.batch-header .summary .cubic_utilization')
