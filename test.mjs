@@ -949,151 +949,7 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
       });
     });
 
-    describe('filter by shipment', () => {
-    //   describe('when checked', async () => {
-        before(async function () {
-            // Create test batch
-            await act(
-              async () =>
-                (this.batch = await app.createBatch({
-                  ship_from: '1',
-                  marketplace: 'US',
-                  name: 'Test Batch Items',
-                }))
-            );
-      
-            // Load inventory info for given MSKUs
-            await act(
-              async () =>
-                (this.inventory = await app.loadInventory({
-                  filters: {
-                    q: [
-                      'B001FOQJOG-076',
-                      '2013-04-19-B004CRYE2C-UA',
-                      '0553537865-PM',
-                      '2019-02-26-B01AXY5YD0-868',
-                    ],
-                  },
-                }))
-            );
-      
-            act(() => app.setState({ isWarehouse: true }));
-      
-            // Create the batch items
-            await act(
-              async () =>
-                (this.batchItems = await app.createBatchItems(
-                  this.batch._id,
-                  this.inventory.data.map((inventory) => ({
-                    inventory,
-                    quantity: 2,
-                    buylist: [{ cost: 500 }],
-                  }))
-                ))
-            );
-      
-            // Load batch items
-            act(() => app.setState({ currentBatch: this.batch._id }));
-            await act(() => app.loadBatchItems(this.batch._id));
-      
-            const mock_inventory = {
-              condition: 'NewItem',
-              fnsku: 'X002L3W3OL',
-              msku: 'B001FOQJOG-076',
-              marketplace: 'US',
-              price: 19998,
-              misc: {},
-              product: {
-                title: 'His Crown is pechalat by Jig',
-                asin: 'B001FOQJOG',
-                image: 'https://m.media-amazon.com/images/I/41i9dZlSsmL.jpg',
-                misc: {
-                  dim: { width: 1499, height: 1349, length: 2474, weight: 2255 },
-                },
-                upc: ['9781477058435'],
-                rank: 123456,
-              },
-            };
-            // fake the update
-            act(() => {
-              this.batchItems.map((item, i) =>
-                app.onBatchItemUpdated({
-                  _id: item._id,
-                  batch_id: item.batch_id,
-                  quantity: i === 0 ? 1 : i === 1 ? 2 : 0,
-                  damaged: i === 0 ? 1 : 0,
-                  shipments: i === 0 ? ['FBA123456789'] : null,
-                  errors: i === 2 ? ['Error!'] : null,
-                  inventory: {
-                    ...mock_inventory,
-                    product_feed_status: i === 0 ? 'HasErrors' : null,
-                    product_feed_errors: i === 0 ? ['Failed!'] : null,
-                    product_feed_batch_id: i === 0 ? this.batch._id : null,
-                    inventory_feed_status: i === 1 ? 'HasErrors' : null,
-                    inventory_feed_errors: i === 1 ? ['Failed!'] : null,
-                    inventory_feed_batch_id: i === 1 ? this.batch._id : null,
-                  },
-                  plans:
-                    i === 0
-                      ? {
-                          plans: [
-                            {
-                              id: 'FBA123456789',
-                              fcid: 'FTW3',
-                              prep: 'SELLER_LABEL',
-                            },
-                          ],
-                        }
-                      : null,
-                })
-              );
-            });
-          });
-        it('should show list of filters', async () => {
-          console.log('shipments',rootContainer.querySelector('.batch-header').innerHTML);
-          act(() =>
-            app.setState({
-              filterItemsToReceive: false,
-              multipackCalculateShipmentQuantity: false,
-            })
-          );
-          await until(() => !app.state.batches.loading);
 
-          const bisDom = rootContainer.querySelectorAll(
-            '.batch-items .batch-item'
-          );
-          expect(bisDom.length).to.equal(4);
-        });
-
-        it('should update the summary to reflect filtered items', () => {
-          act(() =>
-            app.setState({
-              batchItemsFilter: {
-                FBA123456789: [
-                  {
-                    fcid: 'FTW3',
-                    quantity: 5,
-                    cp: false,
-                    prep: 'SELLER_LABEL',
-                    shipmentId: 'FBA123456789',
-                    selected: true,
-                  },
-                ],
-              },
-            })
-          );
-          const bisDom = rootContainer.querySelectorAll(
-            '.batch-items .batch-item'
-          );
-          expect(bisDom.length).to.equal(1);
-
-          expect(
-            rootContainer.querySelector('.batch-header .summary .skus')
-              .textContent
-          ).to.match(/1 SKU/);
-        });
-    //   });
-    });
   });
 
   describe('Sorting', () => {
@@ -1390,4 +1246,121 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
       ).to.be.equal('6.81% Pallet Utilization');
     });
   });
+
+  describe('filter by shipment', () => {
+        before(async function () {
+            // Create test batch
+            await act(
+              async () =>
+                (this.batch = await app.createBatch({
+                  ship_from: '1',
+                  marketplace: 'US',
+                  name: 'Test Batch Items',
+                }))
+            );
+      
+            // Load inventory info for given MSKUs
+            await act(
+              async () =>
+                (this.inventory = await app.loadInventory({
+                  filters: {
+                    q: [
+                      'B001FOQJOG-076',
+                      '2013-04-19-B004CRYE2C-UA',
+                      '0553537865-PM',
+                      '2019-02-26-B01AXY5YD0-868',
+                    ],
+                  },
+                }))
+            );
+      
+            act(() => app.setState({ isWarehouse: true }));
+      
+            // Create the batch items
+            await act(
+              async () =>
+                (this.batchItems = await app.createBatchItems(
+                  this.batch._id,
+                  this.inventory.data.map((inventory) => ({
+                    inventory,
+                    quantity: 2,
+                    buylist: [{ cost: 500 }],
+                  }))
+                ))
+            );
+      
+            // Load batch items
+            act(() => app.setState({ currentBatch: this.batch._id }));
+            await act(() => app.loadBatchItems(this.batch._id));
+      
+            const mock_inventory = {
+              condition: 'NewItem',
+              fnsku: 'X002L3W3OL',
+              msku: 'B001FOQJOG-076',
+              marketplace: 'US',
+              price: 19998,
+              misc: {},
+              product: {
+                title: 'His Crown is pechalat by Jig',
+                asin: 'B001FOQJOG',
+                image: 'https://m.media-amazon.com/images/I/41i9dZlSsmL.jpg',
+                misc: {
+                  dim: { width: 1499, height: 1349, length: 2474, weight: 2255 },
+                },
+                upc: ['9781477058435'],
+                rank: 123456,
+              },
+            };
+            // fake the update
+            act(() => {
+              this.batchItems.map((item, i) =>
+                app.onBatchItemUpdated({
+                  _id: item._id,
+                  batch_id: item.batch_id,
+                  quantity: i === 0 ? 1 : i === 1 ? 2 : 0,
+                  damaged: i === 0 ? 1 : 0,
+                  shipments: i === 0 ? ['FBA123456789'] : null,
+                  errors: i === 2 ? ['Error!'] : null,
+                  inventory: {
+                    ...mock_inventory,
+                    product_feed_status: i === 0 ? 'HasErrors' : null,
+                    product_feed_errors: i === 0 ? ['Failed!'] : null,
+                    product_feed_batch_id: i === 0 ? this.batch._id : null,
+                    inventory_feed_status: i === 1 ? 'HasErrors' : null,
+                    inventory_feed_errors: i === 1 ? ['Failed!'] : null,
+                    inventory_feed_batch_id: i === 1 ? this.batch._id : null,
+                  },
+                  plans:
+                    i === 0
+                      ? {
+                          plans: [
+                            {
+                              id: 'FBA123456789',
+                              fcid: 'FTW3',
+                              prep: 'SELLER_LABEL',
+                            },
+                          ],
+                        }
+                      : null,
+                })
+              );
+            });
+          });
+        it('should show list of filters', async () => {
+          console.log('shipments',rootContainer.querySelector('.batch-header').innerHTML);
+          act(() =>
+            app.setState({
+              filterItemsToReceive: false,
+              multipackCalculateShipmentQuantity: false,
+            })
+          );
+          await until(() => !app.state.batches.loading);
+
+          const bisDom = rootContainer.querySelectorAll(
+            '.batch-items .batch-item'
+          );
+          expect(bisDom.length).to.equal(4);
+        });
+
+    });
 });
