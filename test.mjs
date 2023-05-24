@@ -1295,24 +1295,6 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
             act(() => app.setState({ currentBatch: this.batch._id }));
             await act(() => app.loadBatchItems(this.batch._id));
       
-            const mock_inventory = {
-              condition: 'NewItem',
-              fnsku: 'X002L3W3OL',
-              msku: 'B001FOQJOG-076',
-              marketplace: 'US',
-              price: 19998,
-              misc: {},
-              product: {
-                title: 'His Crown is pechalat by Jig',
-                asin: 'B001FOQJOG',
-                image: 'https://m.media-amazon.com/images/I/41i9dZlSsmL.jpg',
-                misc: {
-                  dim: { width: 1499, height: 1349, length: 2474, weight: 2255 },
-                },
-                upc: ['9781477058435'],
-                rank: 123456,
-              },
-            };
             // fake the update
             act(() => {
               app.updateBatchState(
@@ -1342,22 +1324,13 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
                 })
               )
             });
+
+            expect(getComputedStyle(document.querySelector(".batch-item-filter-label.listed"), null).getPropertyValue("background-color")).to.be.equal('rgb(95, 173, 65)');
+            
+            act(() => Simulate.click(biDom.querySelector('.batch-item-filter-label.listed')));
+
+            expect(getComputedStyle(document.querySelector(".batch-item-filter-label.listed.selected::after"), null).getPropertyValue("background-color")).to.be.equal('linear-gradient(rgba(0, 0, 255, 0.5), rgba(0, 0, 255, 0.5)),linear-gradient(rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0.5))');
+
           });
-        it('should show list of filters', async () => {
-          console.log('shipments filters',rootContainer.querySelector('.batch-items-filter').innerHTML);
-          act(() =>
-            app.setState({
-              filterItemsToReceive: false,
-              multipackCalculateShipmentQuantity: false,
-            })
-          );
-          await until(() => !app.state.batches.loading);
-
-          const bisDom = rootContainer.querySelectorAll(
-            '.batch-items .batch-item'
-          );
-          
-        });
-
     });
 });
