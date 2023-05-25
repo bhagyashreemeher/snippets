@@ -1335,7 +1335,7 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
       
       await until(() => !app.state.batches.loading);
 
-      let label = document.querySelector('.batch-item-filter-label');
+      let label = rootContainer.querySelector('.batch-item-filter-label');
       expect(label.classList.contains('listed')).to.be.true;
 
       act(() =>
@@ -1344,7 +1344,7 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
 
       await until(() => !app.state.batches.loading);
 
-      label = document.querySelector('.batch-item-filter-label');
+      label = rootContainer.querySelector('.batch-item-filter-label');
       expect(label.classList.contains('selected')).to.be.true;
       
     });
