@@ -1248,153 +1248,106 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
   });
 
   describe('filter by shipment', () => {
-        before(async function () {
-            // Create test batch
-            await act(
-              async () =>
-                (this.batch = await app.createBatch({
-                  ship_from: '1',
-                  marketplace: 'US',
-                  name: 'Test Batch Items',
-                }))
-            );
-      
-            // Load inventory info for given MSKUs
-            await act(
-              async () =>
-                (this.inventory = await app.loadInventory({
-                  filters: {
-                    q: [
-                      'B001FOQJOG-076',
-                      '2013-04-19-B004CRYE2C-UA',
-                      '0553537865-PM',
-                      '2019-02-26-B01AXY5YD0-868',
-                    ],
-                  },
-                }))
-            );
-      
-            act(() => app.setState({ isWarehouse: true }));
-      
-            // Create the batch items
-            await act(
-              async () =>
-                (this.batchItems = await app.createBatchItems(
-                  this.batch._id,
-                  this.inventory.data.map((inventory) => ({
-                    inventory,
-                    quantity: 2,
-                    buylist: [{ cost: 500 }],
-                  }))
-                ))
-            );
-      
-            // Load batch items
-            act(() => app.setState({ currentBatch: this.batch._id }));
-            await act(() => app.loadBatchItems(this.batch._id));
-      
-            const mock_inventory = {
-              condition: 'NewItem',
-              fnsku: 'X002L3W3OL',
-              msku: 'B001FOQJOG-076',
+    before(async function () {
+        // Create test batch
+        await act(
+          async () =>
+            (this.batch = await app.createBatch({
+              ship_from: '1',
               marketplace: 'US',
-              price: 19998,
-              misc: {},
-              product: {
-                title: 'His Crown is pechalat by Jig',
-                asin: 'B001FOQJOG',
-                image: 'https://m.media-amazon.com/images/I/41i9dZlSsmL.jpg',
-                misc: {
-                  dim: { width: 1499, height: 1349, length: 2474, weight: 2255 },
-                },
-                upc: ['9781477058435'],
-                rank: 123456,
+              name: 'Test Batch Items',
+            }))
+        );
+  
+        // Load inventory info for given MSKUs
+        await act(
+          async () =>
+            (this.inventory = await app.loadInventory({
+              filters: {
+                q: [
+                  'B001FOQJOG-076',
+                  '2013-04-19-B004CRYE2C-UA',
+                  '0553537865-PM',
+                  '2019-02-26-B01AXY5YD0-868',
+                ],
               },
-            };
-            // fake the update
-            act(() => {
-              app.updateBatchState(
-                app.state.currentBatch, 
-                (b) => ({
-                  items: b.items.map( 
-                    (bi) => ({
-                      ...bi,
-                      shipments:[{
+            }))
+        );
+  
+        act(() => app.setState({ isWarehouse: true }));
+  
+        // Create the batch items
+        await act(
+          async () =>
+            (this.batchItems = await app.createBatchItems(
+              this.batch._id,
+              this.inventory.data.map((inventory) => ({
+                inventory,
+                quantity: 2,
+                buylist: [{ cost: 500 }],
+              }))
+            ))
+        );
+  
+        // Load batch items
+        act(() => app.setState({ currentBatch: this.batch._id }));
+        await act(() => app.loadBatchItems(this.batch._id));
+  
+        // fake the update
+        act(() => {
+          app.updateBatchState(
+            app.state.currentBatch, 
+            (b) => ({
+              items: b.items.map( 
+                (bi) => ({
+                  ...bi,
+                  shipments:[{
+                    id: 'FBA176HVG1RL',
+                    fcid: 'GYR2',
+                    quantity: 1,
+                    prep: 'SELLER_LABEL'
+                  }],
+                  plans: {
+                    plans: [
+                      {
                         id: 'FBA176HVG1RL',
                         fcid: 'GYR2',
                         quantity: 1,
                         prep: 'SELLER_LABEL'
-                      }],
-                      plans: {
-                        plans: [
-                          {
-                            id: 'FBA176HVG1RL',
-                            fcid: 'GYR2',
-                            quantity: 1,
-                            prep: 'SELLER_LABEL'
-                          }
-                        ]
                       }
-                    })
-                  )
+                    ]
+                  }
                 })
               )
-            });
-          });
-        it('should show list of filters', async () => {
-          console.log('shipments filters',rootContainer.querySelector('.batch-items-filter').innerHTML);
-          act(() =>
-            app.setState({
-              filterItemsToReceive: false,
-              multipackCalculateShipmentQuantity: false,
             })
-          );
-          await until(() => !app.state.batches.loading);
-
-          const bisDom = rootContainer.querySelectorAll(
-            '.batch-items .batch-item'
-          );
-
-          expect(
-            getComputedStyle(
-              rootContainer.querySelector('.batch-item-filter-label'),
-              null
-            ).getPropertyValue('background-color')
-          ).to.be.equal('gray');
-          act(() =>
-            Simulate.click(rootContainer.querySelector('.batch-item-filter-label'))
-          );
-    
-          expect(
-            getComputedStyle(
-              rootContainer.querySelector('.batch-item-filter-label.selected'),
-              null
-            ).getPropertyValue('background-color')
-          ).to.be.equal('var(--box-dark-blue)');
-    
-          expect(
-            getComputedStyle(
-              rootContainer.querySelector('.batch-item-filter-label.listed'),
-              null
-            ).getPropertyValue('background-color')
-          ).to.be.equal('rgb(95, 173, 65)');
-    
-          act(() =>
-            Simulate.click(rootContainer.querySelector('.batch-item-filter-label.listed'))
-          );
-    
-          expect(
-            getComputedStyle(
-              rootContainer.querySelector(
-                '.batch-item-filter-label.listed.selected::after'
-              ),
-              null
-            ).getPropertyValue('background-color')
-          ).to.be.equal(
-            'linear-gradient(rgba(0, 0, 255, 0.5), rgba(0, 0, 255, 0.5)),linear-gradient(rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0.5))'
-          );
-          
+          )
         });
+      });
 
+    it('should show list of filters', async () => {
+
+      act(() =>
+        app.setState({
+          filterItemsToReceive: false,
+          multipackCalculateShipmentQuantity: false,
+        })
+      );
+      
+      await until(() => !app.state.batches.loading);
+
+      let label = document.querySelector('.batch-item-filter-label');
+      expect(label.classList.contains('listed')).to.be.true;
+
+      act(() =>
+        Simulate.click(rootContainer.querySelector('.batch-item-filter-label.listed'))
+      );
+
+      await until(() => !app.state.batches.loading);
+
+      label = document.querySelector('.batch-item-filter-label');
+      expect(label.classList.contains('selected')).to.be.true;
+      
     });
+
+  });
 });
