@@ -1354,6 +1354,45 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
           const bisDom = rootContainer.querySelectorAll(
             '.batch-items .batch-item'
           );
+
+          expect(
+            getComputedStyle(
+              rootContainer.querySelector('.batch-item-filter-label'),
+              null
+            ).getPropertyValue('background-color')
+          ).to.be.equal('gray');
+          act(() =>
+            Simulate.click(rootContainer.querySelector('.batch-item-filter-label'))
+          );
+    
+          expect(
+            getComputedStyle(
+              rootContainer.querySelector('.batch-item-filter-label.selected'),
+              null
+            ).getPropertyValue('background-color')
+          ).to.be.equal('var(--box-dark-blue)');
+    
+          expect(
+            getComputedStyle(
+              rootContainer.querySelector('.batch-item-filter-label.listed'),
+              null
+            ).getPropertyValue('background-color')
+          ).to.be.equal('rgb(95, 173, 65)');
+    
+          act(() =>
+            Simulate.click(rootContainer.querySelector('.batch-item-filter-label.listed'))
+          );
+    
+          expect(
+            getComputedStyle(
+              rootContainer.querySelector(
+                '.batch-item-filter-label.listed.selected::after'
+              ),
+              null
+            ).getPropertyValue('background-color')
+          ).to.be.equal(
+            'linear-gradient(rgba(0, 0, 255, 0.5), rgba(0, 0, 255, 0.5)),linear-gradient(rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0.5))'
+          );
           
         });
 
