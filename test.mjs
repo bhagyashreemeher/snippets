@@ -1294,83 +1294,80 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
   });
 
   describe('filter by shipment', () => {
-    before(async function () {
-      // Create test batch
-      await act(
-        async () =>
-          (this.batch = await app.createBatch({
-            ship_from: '1',
-            marketplace: 'US',
-            name: 'Test Batch Items',
-          }))
-      );
 
-      // Load inventory info for given MSKUs
-      await act(
-        async () =>
-          (this.inventory = await app.loadInventory({
-            filters: {
-              q: [
-                'B001FOQJOG-076',
-                '2013-04-19-B004CRYE2C-UA',
-                '0553537865-PM',
-                '2019-02-26-B01AXY5YD0-868',
-              ],
-            },
-          }))
-      );
-
-      act(() => app.setState({ isWarehouse: true }));
-
-      // Create the batch items
-      await act(
-        async () =>
-          (this.batchItems = await app.createBatchItems(
-            this.batch._id,
-            this.inventory.data.map((inventory) => ({
-              inventory,
-              quantity: 2,
-              buylist: [{ cost: 500 }],
-            }))
-          ))
-      );
-
-      // Load batch items
-      act(() => app.setState({ currentBatch: this.batch._id }));
-      await act(() => app.loadBatchItems(this.batch._id));
-
-      // fake the update
-      act(() => {
-        app.updateBatchState(app.state.currentBatch, (b) => ({
-          items: b.items.map((bi) => ({
-            ...bi,
-            shipments: [
-              {
-                id: 'FBA176HVG1RL',
-                fcid: 'GYR2',
-                quantity: 1,
-                prep: 'SELLER_LABEL',
-              },
-            ],
-            plans: {
-              plans: [
-                {
-                  id: 'FBA176HVG1RL',
-                  fcid: 'GYR2',
-                  quantity: 1,
-                  prep: 'SELLER_LABEL',
-                },
-              ],
-            },
-          })),
-        }));
-      });
-
-
-
-    });
-    
     it('verify color',()=>{
+
+            // Create test batch
+            await act(
+              async () =>
+                (this.batch = await app.createBatch({
+                  ship_from: '1',
+                  marketplace: 'US',
+                  name: 'Test Batch Items',
+                }))
+            );
+      
+            // Load inventory info for given MSKUs
+            await act(
+              async () =>
+                (this.inventory = await app.loadInventory({
+                  filters: {
+                    q: [
+                      'B001FOQJOG-076',
+                      '2013-04-19-B004CRYE2C-UA',
+                      '0553537865-PM',
+                      '2019-02-26-B01AXY5YD0-868',
+                    ],
+                  },
+                }))
+            );
+      
+            act(() => app.setState({ isWarehouse: true }));
+      
+            // Create the batch items
+            await act(
+              async () =>
+                (this.batchItems = await app.createBatchItems(
+                  this.batch._id,
+                  this.inventory.data.map((inventory) => ({
+                    inventory,
+                    quantity: 2,
+                    buylist: [{ cost: 500 }],
+                  }))
+                ))
+            );
+      
+            // Load batch items
+            act(() => app.setState({ currentBatch: this.batch._id }));
+            await act(() => app.loadBatchItems(this.batch._id));
+      
+            // fake the update
+            act(() => {
+              app.updateBatchState(app.state.currentBatch, (b) => ({
+                items: b.items.map((bi) => ({
+                  ...bi,
+                  shipments: [
+                    {
+                      id: 'FBA176HVG1RL',
+                      fcid: 'GYR2',
+                      quantity: 1,
+                      prep: 'SELLER_LABEL',
+                    },
+                  ],
+                  plans: {
+                    plans: [
+                      {
+                        id: 'FBA176HVG1RL',
+                        fcid: 'GYR2',
+                        quantity: 1,
+                        prep: 'SELLER_LABEL',
+                      },
+                    ],
+                  },
+                })),
+              }));
+            });
+
       expect(
         getComputedStyle(
           rootContainer.querySelector('.batch-item-filter-label'),
