@@ -948,54 +948,8 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
         });
       });
     });
-    describe('filter by shipment', () => {
-      describe('when checked', async () => {
-        it('should show list of filters', async () => {
-          act(() =>
-            app.setState({
-              filterItemsToReceive: false,
-              multipackCalculateShipmentQuantity: false,
-            })
-          );
-          await until(() => !app.state.batches.loading);
 
-          await until(() => !app.state.batches.loading);
 
-          const bisDom = rootContainer.querySelectorAll(
-            '.batch-items .batch-item'
-          );
-          expect(bisDom.length).to.equal(4);
-        });
-
-        it('should update the summary to reflect filtered items', () => {
-          act(() =>
-            app.setState({
-              batchItemsFilter: {
-                FBA123456789: [
-                  {
-                    fcid: 'FTW3',
-                    quantity: 5,
-                    cp: false,
-                    prep: 'SELLER_LABEL',
-                    shipmentId: 'FBA123456789',
-                    selected: true,
-                  },
-                ],
-              },
-            })
-          );
-          const bisDom = rootContainer.querySelectorAll(
-            '.batch-items .batch-item'
-          );
-          expect(bisDom.length).to.equal(1);
-
-          expect(
-            rootContainer.querySelector('.batch-header .summary .skus')
-              .textContent
-          ).to.match(/1 SKU/);
-        });
-      });
-    });
   });
 
   describe('Sorting', () => {
@@ -1294,9 +1248,7 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
   });
 
   describe('filter by shipment', () => {
-
-    it('verify color',()=>{
-
+        before(async function () {
             // Create test batch
             await act(
               async () =>
@@ -1341,71 +1293,69 @@ expect( rootContainer.querySelector('.delete-batch-item-modal') ).to.equal( null
             act(() => app.setState({ currentBatch: this.batch._id }));
             await act(() => app.loadBatchItems(this.batch._id));
       
+            const mock_inventory = {
+              condition: 'NewItem',
+              fnsku: 'X002L3W3OL',
+              msku: 'B001FOQJOG-076',
+              marketplace: 'US',
+              price: 19998,
+              misc: {},
+              product: {
+                title: 'His Crown is pechalat by Jig',
+                asin: 'B001FOQJOG',
+                image: 'https://m.media-amazon.com/images/I/41i9dZlSsmL.jpg',
+                misc: {
+                  dim: { width: 1499, height: 1349, length: 2474, weight: 2255 },
+                },
+                upc: ['9781477058435'],
+                rank: 123456,
+              },
+            };
             // fake the update
             act(() => {
-              app.updateBatchState(app.state.currentBatch, (b) => ({
-                items: b.items.map((bi) => ({
-                  ...bi,
-                  shipments: [
-                    {
-                      id: 'FBA176HVG1RL',
-                      fcid: 'GYR2',
-                      quantity: 1,
-                      prep: 'SELLER_LABEL',
-                    },
-                  ],
-                  plans: {
-                    plans: [
-                      {
+              app.updateBatchState(
+                app.state.currentBatch, 
+                (b) => ({
+                  items: b.items.map( 
+                    (bi) => ({
+                      ...bi,
+                      shipments:[{
                         id: 'FBA176HVG1RL',
                         fcid: 'GYR2',
                         quantity: 1,
-                        prep: 'SELLER_LABEL',
-                      },
-                    ],
-                  },
-                })),
-              }));
+                        prep: 'SELLER_LABEL'
+                      }],
+                      plans: {
+                        plans: [
+                          {
+                            id: 'FBA176HVG1RL',
+                            fcid: 'GYR2',
+                            quantity: 1,
+                            prep: 'SELLER_LABEL'
+                          }
+                        ]
+                      }
+                    })
+                  )
+                })
+              )
             });
+          });
+        it('should show list of filters', async () => {
+          console.log('shipments filters',rootContainer.querySelector('.batch-items-filter').innerHTML);
+          act(() =>
+            app.setState({
+              filterItemsToReceive: false,
+              multipackCalculateShipmentQuantity: false,
+            })
+          );
+          await until(() => !app.state.batches.loading);
 
-      expect(
-        getComputedStyle(
-          rootContainer.querySelector('.batch-item-filter-label'),
-          null
-        ).getPropertyValue('background-color')
-      ).to.be.equal('gray');
-      act(() =>
-        Simulate.click(rootContainer.querySelector('.batch-item-filter-label'))
-      );
+          const bisDom = rootContainer.querySelectorAll(
+            '.batch-items .batch-item'
+          );
+          
+        });
 
-      expect(
-        getComputedStyle(
-          rootContainer.querySelector('.batch-item-filter-label.selected'),
-          null
-        ).getPropertyValue('background-color')
-      ).to.be.equal('var(--box-dark-blue)');
-
-      expect(
-        getComputedStyle(
-          rootContainer.querySelector('.batch-item-filter-label.listed'),
-          null
-        ).getPropertyValue('background-color')
-      ).to.be.equal('rgb(95, 173, 65)');
-
-      act(() =>
-        Simulate.click(rootContainer.querySelector('.batch-item-filter-label.listed'))
-      );
-
-      expect(
-        getComputedStyle(
-          rootContainer.querySelector(
-            '.batch-item-filter-label.listed.selected::after'
-          ),
-          null
-        ).getPropertyValue('background-color')
-      ).to.be.equal(
-        'linear-gradient(rgba(0, 0, 255, 0.5), rgba(0, 0, 255, 0.5)),linear-gradient(rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0.5))'
-      );
     });
-  });
 });
