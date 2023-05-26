@@ -1,3 +1,14 @@
+/**
+ * @param {IBatch} batch
+ * @param {object} $1
+ * @param {boolean=} $1.filterItemsWithErrors
+ * @param {boolean=} $1.filterItemsToReceive
+ * @param {boolean=} $1.excludeItemsInShipments
+ * @param {boolean=} $1.filterItemsMissingDimensions
+ * @param {any} $1.app
+ * @param {object} $1.batchItemsFilter
+ * @return {{ total_count: number, total_quantity: number, total_ordered: number, total_cost: number, total_payout: number, avg_rank: number, total_rank: number, total_volume:number,total_weight:number }}}
+ **/
 const summarizeBatch = (
   batch,
   {
